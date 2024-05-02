@@ -7,10 +7,12 @@ canvas.height = 600;
 const cellSize = 100;
 const cellGap = 3;
 const gameGrid = [];
+const defenders = [];
+const defenderCost = 100;
 
 const mouse = {
-  x: undefined,
-  y: undefined,
+  x: 10,
+  y: 10,
   width: 0.1,
   height: 0.1,
 };
@@ -22,7 +24,7 @@ canvas.addEventListener("mousemove", (e) => {
   mouse.y = e.clientY - pos.top;
 });
 
-canvas.addEventListener("mousemove", (e) => {
+canvas.addEventListener("mouseleave", (e) => {
   mouse.x = undefined;
   mouse.y = undefined;
 });
@@ -42,8 +44,10 @@ class Cell {
   }
 
   draw() {
-    ctx.strokeStyle = "black";
-    ctx.strokeRect(this.x, this.y, this.width, this.height);
+    if (mouse.x && mouse.y && collision(this, mouse)) {
+      ctx.strokeStyle = "black";
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
   }
 }
 
@@ -63,11 +67,35 @@ function drawGrid() {
   });
 }
 
+class Defender {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.width = cellSize;
+    this.height = cellSize;
+    this.shooting = false;
+  }
+}
+
 //animation loop
 function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "blue";
   ctx.fillRect(0, 0, headerBar.width, headerBar.height);
   drawGrid();
   requestAnimationFrame(animate);
 }
 animate();
+
+function collision(first, second) {
+  if (
+    !(
+      first.x > second.x + second.width ||
+      first.x + first.width < second.x ||
+      first.y > second.y + second.height ||
+      first.y + first.height < second.y
+    )
+  ) {
+    return true;
+  }
+}
