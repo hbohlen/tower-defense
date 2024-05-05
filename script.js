@@ -1,5 +1,7 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+import { Defender } from "./js/classes/Defender.js";
+
+export const canvas = document.getElementById("canvas");
+export const ctx = canvas.getContext("2d");
 canvas.width = 900;
 canvas.height = 600;
 const resourceImage = new Image();
@@ -8,8 +10,8 @@ const tilemapImage = new Image();
 tilemapImage.src = "./assets/Tilemap_Flat.png";
 
 // global variables
-const cellSize = 100;
-const cellGap = 3;
+export const cellSize = 100;
+export const cellGap = 3;
 let numberOfResources = 300;
 let enemiesInterval = 600;
 let frame = 0;
@@ -23,7 +25,7 @@ const gameGrid = [];
 const defenders = [];
 const enemies = [];
 const enemyPositions = [];
-const projectiles = [];
+export const projectiles = [];
 const resources = [];
 
 // mouse
@@ -78,25 +80,25 @@ function handleGameGrid() {
   }
 }
 // projectiles
-class Projectile {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.width = 10;
-    this.height = 10;
-    this.power = 20;
-    this.speed = 5;
-  }
-  update() {
-    this.x += this.speed;
-  }
-  draw() {
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
+// class Projectile {
+//   constructor(x, y) {
+//     this.x = x;
+//     this.y = y;
+//     this.width = 10;
+//     this.height = 10;
+//     this.power = 20;
+//     this.speed = 5;
+//   }
+//   update() {
+//     this.x += this.speed;
+//   }
+//   draw() {
+//     ctx.fillStyle = "black";
+//     ctx.beginPath();
+//     ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2);
+//     ctx.fill();
+//   }
+// }
 function handleProjectiles() {
   for (let i = 0; i < projectiles.length; i++) {
     projectiles[i].update();
@@ -121,36 +123,36 @@ function handleProjectiles() {
   }
 }
 
-// defenders
-class Defender {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.width = cellSize - cellGap * 2;
-    this.height = cellSize - cellGap * 2;
-    this.shooting = false;
-    this.health = 100;
-    this.projectiles = [];
-    this.timer = 0;
-  }
-  draw() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-    ctx.fillStyle = "gold";
-    ctx.font = "30px MedivalSharp";
-    ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
-  }
-  update() {
-    if (this.shooting) {
-      this.timer++;
-      if (this.timer % 100 === 0) {
-        projectiles.push(new Projectile(this.x + 70, this.y + 50));
-      }
-    } else {
-      this.timer = 0;
-    }
-  }
-}
+// // defenders
+// class Defender {
+//   constructor(x, y) {
+//     this.x = x;
+//     this.y = y;
+//     this.width = cellSize - cellGap * 2;
+//     this.height = cellSize - cellGap * 2;
+//     this.shooting = false;
+//     this.health = 100;
+//     this.projectiles = [];
+//     this.timer = 0;
+//   }
+//   draw() {
+//     ctx.fillStyle = "blue";
+//     ctx.fillRect(this.x, this.y, this.width, this.height);
+//     ctx.fillStyle = "gold";
+//     ctx.font = "30px MedivalSharp";
+//     ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+//   }
+//   update() {
+//     if (this.shooting) {
+//       this.timer++;
+//       if (this.timer % 100 === 0) {
+//         projectiles.push(new Projectile(this.x + 70, this.y + 50));
+//       }
+//     } else {
+//       this.timer = 0;
+//     }
+//   }
+// }
 canvas.addEventListener("click", function () {
   const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
   const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
