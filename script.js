@@ -2,6 +2,10 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 900;
 canvas.height = 600;
+const resourceImage = new Image();
+resourceImage.src = "./assets/G_Idle.png";
+const tilemapImage = new Image();
+tilemapImage.src = "./assets/Tilemap_Flat.png";
 
 // global variables
 const cellSize = 100;
@@ -12,6 +16,8 @@ let frame = 0;
 let gameOver = false;
 let score = 0;
 const winningScore = 50;
+const spriteWidth = 64;
+const spriteHeight = 64;
 
 const gameGrid = [];
 const defenders = [];
@@ -43,11 +49,13 @@ const controlsBar = {
   height: cellSize,
 };
 class Cell {
-  constructor(x, y) {
+  constructor(x, y, spriteX, spriteY) {
     this.x = x;
     this.y = y;
     this.width = cellSize;
     this.height = cellSize;
+    this.spriteX = spriteX;
+    this.spriteY = spriteY;
   }
   draw() {
     if (mouse.x && mouse.y && collision(this, mouse)) {
@@ -59,7 +67,7 @@ class Cell {
 function createGrid() {
   for (let y = cellSize; y < canvas.height; y += cellSize) {
     for (let x = 0; x < canvas.width; x += cellSize) {
-      gameGrid.push(new Cell(x, y));
+      gameGrid.push(new Cell(x, y, 1, 1));
     }
   }
 }
@@ -239,8 +247,7 @@ class Resource {
     this.amount = amounts[Math.floor(Math.random() * amounts.length)];
   }
   draw() {
-    ctx.fillStyle = "yellow";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.drawImage(resourceImage, this.x, this.y, this.width, this.height);
     ctx.fillStyle = "black";
     ctx.font = "20px MedivalSharp";
     ctx.fillText(this.amount, this.x + 15, this.y + 25);
@@ -293,7 +300,10 @@ function animate() {
   frame++;
   if (!gameOver) requestAnimationFrame(animate);
 }
-animate();
+
+resourceImage.onload = function () {
+  animate();
+};
 
 function collision(first, second) {
   if (
