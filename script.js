@@ -35,8 +35,8 @@ const mouse = {
 };
 let canvasPosition = canvas.getBoundingClientRect();
 canvas.addEventListener("mousemove", function (e) {
-  mouse.x = e.x - canvasPosition.left;
-  mouse.y = e.y - canvasPosition.top;
+  mouse.x = e.clientX - canvasPosition.left;
+  mouse.y = e.clientY - canvasPosition.top;
 });
 canvas.addEventListener("mouseleave", function () {
   mouse.y = undefined;
@@ -48,6 +48,10 @@ const controlsBar = {
   width: canvas.width,
   height: cellSize,
 };
+
+const gridImage = new Image();
+gridImage.src = "./assets/background.png";
+
 class Cell {
   constructor(x, y, spriteX, spriteY) {
     this.x = x;
@@ -73,6 +77,7 @@ function createGrid() {
 }
 createGrid();
 function handleGameGrid() {
+  ctx.drawImage(gridImage, 0, cellSize, canvas.width, canvas.height);
   for (let i = 0; i < gameGrid.length; i++) {
     gameGrid[i].draw();
   }
@@ -144,9 +149,13 @@ class Defender {
   draw() {
     //ctx.fillStyle = "blue";
     //ctx.fillRect(this.x, this.y, this.width, this.height);
-    ctx.fillStyle = "gold";
     ctx.font = "30px MedivalSharp";
-    ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 5;
+    ctx.strokeText(Math.floor(this.health), this.x + 25, this.y);
+    ctx.fillStyle = "red";
+    ctx.fillText(Math.floor(this.health), this.x + 25, this.y);
+
     ctx.drawImage(
       defenderImage,
       this.frameX * this.spriteWidth,
@@ -240,9 +249,14 @@ class Enemy {
   draw() {
     //ctx.fillStyle = "red";
     //ctx.fillRect(this.x, this.y, this.width, this.height);
-    //ctx.fillStyle = "black";
     ctx.font = "30px MedivalSharp";
-    ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 5;
+    ctx.strokeText(Math.floor(this.health), this.x + 25, this.y);
+    ctx.fillStyle = "red";
+    ctx.fillText(Math.floor(this.health), this.x + 25, this.y);
+    //ctx.strokeRect(this.x, this.y, this.width, this.height);
+
     ctx.drawImage(
       enemyImage,
       this.frameX * this.spriteWidth,
@@ -322,46 +336,72 @@ function handleGameStatus() {
   if (gameOver) {
     ctx.fillStyle = "black";
     ctx.font = "90px MedivalSharp";
-    ctx.fillText("GAME OVER", 135, 330);
+    ctx.fillText("GAME OVER", canvas.width / 2 - 270, canvas.height / 2);
+    ctx.font = "60px MedivalSharp";
+    ctx.fillText(
+      "Your Score: " + score,
+      canvas.width / 2 - 200,
+      canvas.height / 2 + 70
+    );
   }
   if (score >= winningScore && enemies.length === 0) {
     ctx.fillStyle = "black";
     ctx.font = "60px MedivalSharp";
-    ctx.fillText("LEVEL COMPLETE", 130, 300);
+    ctx.fillText("LEVEL COMPLETE", canvas.width / 2 - 230, canvas.height / 2);
     ctx.font = "30px MedivalSharp";
-    ctx.fillText("You win with " + score + " points!", 134, 340);
+    ctx.fillText(
+      "You win with " + score + " points!",
+      canvas.width / 2 - 150,
+      canvas.height / 2 + 50
+    );
   }
 }
 
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "blue";
-  ctx.fillRect(0, 0, controlsBar.width, controlsBar.height);
-  handleGameGrid();
-  handleDefenders();
-  handleResources();
-  handleProjectiles();
-  handleEnemies();
-  handleGameStatus();
-  frame++;
-  if (!gameOver) requestAnimationFrame(animate);
+  if (!gameOver) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    handleGameGrid();
+    handleDefenders();
+    handleResources();
+    handleProjectiles();
+    handleEnemies();
+    handleGameStatus();
+    frame++;
+    requestAnimationFrame(animate);
+  } else {
+    displayGameOverScreen();
+  }
+}
+
+function displayGameOverScreen() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+  ctx.fillStyle = "black";
+  ctx.font = "90px MedivalSharp";
+  ctx.fillText("GAME OVER", canvas.width / 2 - 270, canvas.height / 2);
+  ctx.font = "60px MedivalSharp";
+  ctx.fillText(
+    "Your Score: " + score,
+    canvas.width / 2 - 200,
+    canvas.height / 2 + 70
+  );
 }
 
 resourceImage.onload = function () {
-  animate();
+  document.getElementById("playButton").addEventListener("click", function () {
+    document.getElementById("canvas").style.display = "block"; // Show the canvas
+    canvasPosition = canvas.getBoundingClientRect(); // Update canvas position
+    this.style.display = "none"; // Hide the play button
+    animate(); // Start the game
+  });
 };
 
 function collision(first, second) {
-  if (
-    !(
-      first.x > second.x + second.width ||
-      first.x + first.width < second.x ||
-      first.y > second.y + second.height ||
-      first.y + first.height < second.y
-    )
-  ) {
-    return true;
-  }
+  return !(
+    first.x > second.x + second.width ||
+    first.x + first.width < second.x ||
+    first.y > second.y + second.height ||
+    first.y + first.height < second.y
+  );
 }
 
 window.addEventListener("resize", function () {
