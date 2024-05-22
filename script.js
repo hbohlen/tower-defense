@@ -1,5 +1,5 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+export const canvas = document.getElementById("canvas");
+export const ctx = canvas.getContext("2d");
 canvas.width = 900;
 canvas.height = 600;
 const resourceImage = new Image();
@@ -8,8 +8,8 @@ const tilemapImage = new Image();
 tilemapImage.src = "./assets/Tilemap_Flat.png";
 
 // global variables
-const cellSize = 100;
-const cellGap = 3;
+export const cellSize = 100;
+export const cellGap = 3;
 let numberOfResources = 300;
 let enemiesInterval = 600;
 let frame = 0;
@@ -23,7 +23,7 @@ const gameGrid = [];
 const defenders = [];
 const enemies = [];
 const enemyPositions = [];
-const projectiles = [];
+export const projectiles = [];
 const resources = [];
 
 // mouse
@@ -77,7 +77,7 @@ function handleGameGrid() {
     gameGrid[i].draw();
   }
 }
-// projectiles
+//projectiles
 class Projectile {
   constructor(x, y) {
     this.x = x;
@@ -121,6 +121,8 @@ function handleProjectiles() {
   }
 }
 
+const defenderImage = new Image();
+defenderImage.src = "./assets/plant.png";
 // defenders
 class Defender {
   constructor(x, y) {
@@ -132,19 +134,40 @@ class Defender {
     this.health = 100;
     this.projectiles = [];
     this.timer = 0;
+    this.frameX = 0;
+    this.frameY = 0;
+    this.minFrame = 0;
+    this.maxFrame = 1;
+    this.spriteWidth = 167;
+    this.spriteHeight = 243;
   }
   draw() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    //ctx.fillStyle = "blue";
+    //ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.fillStyle = "gold";
     ctx.font = "30px MedivalSharp";
     ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+    ctx.drawImage(
+      defenderImage,
+      this.frameX * this.spriteWidth,
+      this.frameY * this.spriteHeight,
+      this.spriteWidth,
+      this.spriteHeight,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
   }
   update() {
     if (this.shooting) {
       this.timer++;
       if (this.timer % 100 === 0) {
         projectiles.push(new Projectile(this.x + 70, this.y + 50));
+      }
+      if (frame % 40 == 0) {
+        if (this.frameX < this.maxFrame) this.frameX++;
+        else this.frameX = this.minFrame;
       }
     } else {
       this.timer = 0;
@@ -187,7 +210,9 @@ function handleDefenders() {
     }
   }
 }
-// enemies
+//enemies
+const enemyImage = new Image();
+enemyImage.src = "./assets/zombie.png";
 class Enemy {
   constructor(verticalPosition) {
     this.x = canvas.width;
@@ -198,16 +223,37 @@ class Enemy {
     this.movement = this.speed;
     this.health = 100;
     this.maxHealth = this.health;
+    this.frameX = 0;
+    this.frameY = 0;
+    this.minFrame = 0;
+    this.maxFrame = 4;
+    this.spriteWidth = 292;
+    this.spriteHeight = 410;
   }
   update() {
     this.x -= this.movement;
+    if (frame % 10 == 0) {
+      if (this.frameX < this.maxFrame) this.frameX++;
+      else this.frameX = this.minFrame;
+    }
   }
   draw() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-    ctx.fillStyle = "black";
+    //ctx.fillStyle = "red";
+    //ctx.fillRect(this.x, this.y, this.width, this.height);
+    //ctx.fillStyle = "black";
     ctx.font = "30px MedivalSharp";
     ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+    ctx.drawImage(
+      enemyImage,
+      this.frameX * this.spriteWidth,
+      this.frameY * this.spriteHeight,
+      this.spriteWidth,
+      this.spriteHeight,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
   }
 }
 function handleEnemies() {
