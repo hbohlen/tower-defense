@@ -292,7 +292,8 @@ function handleEnemies() {
       Math.floor(Math.random() * 5 + 1) * cellSize + cellGap;
     enemies.push(new Enemy(verticalPosition));
     enemyPositions.push(verticalPosition);
-    if (enemiesInterval > 120) enemiesInterval -= 50;
+    if (enemiesInterval > 120) enemiesInterval -= 30; // Reduced decrement
+    if (enemiesInterval < 200) enemiesInterval = 200; // Minimum threshold
   }
 }
 
@@ -314,7 +315,7 @@ class Resource {
   }
 }
 function handleResources() {
-  if (frame % 500 === 0 && score < winningScore) {
+  if (frame % 300 === 0 && score < winningScore) {
     resources.push(new Resource());
   }
   for (let i = 0; i < resources.length; i++) {
